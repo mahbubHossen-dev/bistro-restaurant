@@ -1,10 +1,31 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Link, NavLink } from 'react-router-dom';
+import { AuthContext } from '../../../Provider/AuthProvider';
+import toast from 'react-hot-toast';
+import useCart from '../../../hooks/useCart';
 
 const Navbar = () => {
+
+    const {user, logoutUser} = useContext(AuthContext)
+    const [cart] = useCart()
+    console.log(cart)
+    const logOutUser = () => {
+        logoutUser()
+        .then(res=> {
+            toast.success('logout success')
+        })
+        .catch(() => {
+            console.log('logout not success')
+        })
+    }
+
     const menuItems = <>
-        <li><Link to='/'>Home</Link></li>
-        <li><Link to='/menu'>Menu</Link></li>
+        <li><NavLink to='/'>Home</NavLink></li>
+        <li><NavLink to='/menu'>Menu</NavLink></li>
+        <li><NavLink to='/ourShop/salad'>Our Shop</NavLink></li>
+        {
+            user && <li><NavLink to='/dashboard'>{cart?.length ? cart?.length : 0}</NavLink></li>
+        }
     </>
     return (
         <div className='fixed w-full z-10'>
@@ -40,7 +61,15 @@ const Navbar = () => {
                             {menuItems}
                         </ul>
                     </div>
-                    <a className="btn">Button</a>
+                    {
+                        user ?
+                            <Link onClick={logOutUser} className="btn">Logout</Link>
+                            :
+                            <>
+                                <Link to={'/login'} className="btn">Login</Link>
+                                <Link to={'/signUp'} className="btn">Sign Up</Link>
+                            </>
+                    }
                 </div>
             </div>
         </div>
